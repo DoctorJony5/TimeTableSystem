@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <!-- Basic head stuff -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timetable Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script defer src="app.js"></script>
+    <!-- Something something importing too much = more points of failure-->
+  </head>
+  <body>
+    <div class="ambient-bg" aria-hidden="true"></div>
+
+    <main class="app-shell">
+      <!-- Header Section: Title, Buttons, Link(GitHub) -->
+      <header class="app-header card">
+        <div>
+          <p class="eyebrow">Untitled Project 005</p>
+          <h1>Timetable Thing</h1>
+          <p class="subtitle">
+            Timetable System
+          </p>
+        </div>
+        <div class="header-actions">
+            <!-- GitHub profile shortcut.  -->
+            <!-- ToDo: Add a shortcut or button for a ReadMe or explanation thing-->
+          
+            <a class="github-link" href="https://github.com/DoctorJony5" target="_blank" rel="noopener noreferrer" title="GitHub">
+            
+                <svg viewBox="0 0 16 16" role="img" aria-hidden="true" focusable="false">
+                    <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.52 7.52 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8" />
+                </svg>
+                <!-- Above SVG taken from https://brand.github.com/foundations/logo -->
+
+            </a>
+          <button id="themeToggle" type="button" class="secondary">Switch to Dark</button>
+          <!-- ToDo: Add a shortcut or button for a ReadMe or explanation thing-->
+          <button id="clearAllBtn" type="button" class="danger">Clear Classes</button>
+          <!-- ToDo: Currently this just deletes classes, not subjects, so need to do that as well-->
+          <!-- ToDo: Maybe work in a simple history system ?-->
+        </div>
+      </header>
+
+
+
+        <!-- Main editing workspace -->
+        <!-- Left: Subject, Class, Settings Panels (collapsable)-->
+        <!-- Right: Timetable, export buttons-->
+      <section class="workspace">
+
+        <!-- Left hand side section-->
+        <aside class="left-stack">
+
+            <!-- Subject panel: Form for adding/editing subjects, list of subjects. -->
+            <section class="card subject-panel collapsible-panel" data-panel-key="subject">
+
+                <div class="panel-collapsible-header">
+
+                    <div class="panel-top stack">
+                        <h2 id="subjectFormTitle">Add Subject</h2>
+                        <p class="subtle">Subjects store a default teacher, room, and color.</p>
+                    </div>
+                    
+                    <button type="button" class="panel-toggle secondary" data-panel-toggle="subject" aria-expanded="true" aria-controls="subjectPanelBody">
+                        <span class="panel-toggle-text">Collapse</span>
+                    </button>
+
+                </div>
+
+                <!-- Subject form -->
+                <div id="subjectPanelBody" class="panel-collapsible-body">
+                <form id="subjectForm" novalidate>
+                <div class="field-row">
+                    <div class="field">
+                    <label for="subjectNameInput">Subject name</label>
+                    <input
+                        id="subjectNameInput"
+                        name="subjectName"
+                        type="text"
+                        maxlength="80"
+                        placeholder="Computer Programming"
+                        required
+                    />
+                    </div>
+                    <div class="field">
+                    <label for="subjectCodeInput">Subject code</label>
+                    <input id="subjectCodeInput" name="subjectCode" type="text" maxlength="20" placeholder="COMP101" />
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                    <label for="subjectTeacherInput">Teacher</label>
+                    <input
+                        id="subjectTeacherInput"
+                        name="subjectTeacher"
+                        type="text"
+                        maxlength="60"
+                        placeholder="Dr. Lee"
+                    />
+                    </div>
+                    <div class="field">
+                    <label for="subjectRoomInput">Default room</label>
+                    <input id="subjectRoomInput" name="subjectRoom" type="text" maxlength="60" placeholder="B-204" />
+                    </div>
+                </div>
+
+                <div class="field field-tight">
+                    <label for="subjectColorInput">Subject color</label>
+                    <input id="subjectColorInput" name="subjectColor" type="color" value="#159f8b" />
+                </div>
+
+                <p id="subjectFormError" class="form-error" role="alert" aria-live="polite"></p>
+
+                <div class="form-actions">
+                    <button id="saveSubjectBtn" type="submit">Add Subject</button>
+                    <button id="cancelSubjectEditBtn" type="button" class="secondary hidden">Cancel Edit</button>
+                    <button id="resetSubjectBtn" type="button" class="ghost">Reset</button>
+                </div>
+                </form>
+
+                <div id="subjectList" class="subject-list"></div>
+                </div>
+          </section>
+
+          <section class="card form-panel collapsible-panel" data-panel-key="classSession">
+            <div class="panel-collapsible-header">
+              <div class="panel-top stack">
+                <h2 id="formTitle">Add Class Session</h2>
+                <p class="subtle">Classes belong to a subject and can override room or teacher.</p>
+              </div>
+              <button
+                type="button"
+                class="panel-toggle secondary"
+                data-panel-toggle="classSession"
+                aria-expanded="true"
+                aria-controls="classSessionPanelBody"
+              >
+                <span class="panel-toggle-text">Collapse</span>
+              </button>
+            </div>
+
+            <div id="classSessionPanelBody" class="panel-collapsible-body">
+              <form id="classForm" novalidate>
+              <div class="field-row">
+                <div class="field">
+                  <label for="subjectSelect">Subject</label>
+                  <select id="subjectSelect" name="subject" required></select>
+                </div>
+                <div class="field">
+                  <label for="titleInput">Session title</label>
+                  <input id="titleInput" name="title" type="text" maxlength="80" placeholder="Week 4 Lab" required />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="typeSelect">Type</label>
+                  <select id="typeSelect" name="type" required>
+                    <option>Class</option>
+                    <option>Lecture</option>
+                    <option>Lab</option>
+                    <option>Workshop</option>
+                    <option>Seminar</option>
+                    <option>Tutorial</option>
+                    <option>Custom</option>
+                  </select>
+                </div>
+                <div class="field hidden" id="customTypeWrap">
+                  <label for="customTypeInput">Custom type</label>
+                  <input id="customTypeInput" name="customType" type="text" maxlength="40" placeholder="Studio" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="daySelect">Day</label>
+                  <select id="daySelect" name="day" required>
+                    <option>Monday</option>
+                    <option>Tuesday</option>
+                    <option>Wednesday</option>
+                    <option>Thursday</option>
+                    <option>Friday</option>
+                    <option>Saturday</option>
+                    <option>Sunday</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="colorInput">Color override</label>
+                  <input id="colorInput" name="color" type="color" value="#159f8b" />
+                </div>
+              </div>
+
+              <label class="check-line" for="inheritSubjectColorInput">
+                <input id="inheritSubjectColorInput" name="inheritSubjectColor" type="checkbox" checked />
+                Use subject color for this class session
+              </label>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="startTimeInput">Start</label>
+                  <input id="startTimeInput" name="startTime" type="time" value="09:00" required />
+                </div>
+                <div class="field">
+                  <label for="endTimeInput">End</label>
+                  <input id="endTimeInput" name="endTime" type="time" value="10:00" required />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="locationInput">Room override</label>
+                  <input id="locationInput" name="location" type="text" maxlength="60" placeholder="Use default room" />
+                </div>
+                <div class="field">
+                  <label for="teacherInput">Teacher override</label>
+                  <input id="teacherInput" name="teacher" type="text" maxlength="60" placeholder="Use subject teacher" />
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="notesInput">Notes</label>
+                <textarea
+                  id="notesInput"
+                  name="notes"
+                  rows="3
+                    />"
+                  maxlength="220"
+                  placeholder="Bring lab laptop, assignment review, etc."
+                ></textarea>
+              </div>
+
+              <p id="formError" class="form-error" role="alert" aria-live="polite"></p>
+
+              <div class="form-actions">
+                <button id="saveClassBtn" type="submit">Add Class</button>
+                <button id="cancelEditBtn" type="button" class="secondary hidden">Cancel Edit</button>
+                <button id="resetFormBtn" type="button" class="ghost">Reset</button>
+              </div>
+              </form>
+            </div>
+          </section>
+
+          <section class="card settings-panel collapsible-panel" data-panel-key="settings">
+            <div class="panel-collapsible-header">
+              <div class="panel-top stack">
+                <h2>Settings</h2>
+                <p class="subtle">Adjust display and export preferences.</p>
+              </div>
+              <button
+                type="button"
+                class="panel-toggle secondary"
+                data-panel-toggle="settings"
+                aria-expanded="true"
+                aria-controls="settingsPanelBody"
+              >
+                <span class="panel-toggle-text">Collapse</span>
+              </button>
+            </div>
+
+            <div id="settingsPanelBody" class="panel-collapsible-body">
+              <div class="settings-group">
+              <h3>Display</h3>
+              <label class="check-line" for="showWeekendsInput">
+                <input id="showWeekendsInput" type="checkbox" checked />
+                Show Saturday and Sunday
+              </label>
+              <label class="check-line" for="showTeacherInput">
+                <input id="showTeacherInput" type="checkbox" checked />
+                Show teacher on timetable cards
+              </label>
+              <label class="check-line" for="showLocationInput">
+                <input id="showLocationInput" type="checkbox" checked />
+                Show room on timetable cards
+              </label>
+              <label class="check-line" for="compactCardsInput">
+                <input id="compactCardsInput" type="checkbox" />
+                Compact timetable cards
+              </label>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="dayStartHourSelect">Day starts</label>
+                  <select id="dayStartHourSelect"></select>
+                </div>
+                <div class="field">
+                  <label for="dayEndHourSelect">Day ends</label>
+                  <select id="dayEndHourSelect"></select>
+                </div>
+              </div>
+
+              <div class="field field-tight">
+                <label for="hourHeightSelect">Row height</label>
+                <select id="hourHeightSelect">
+                  <option value="46">Compact</option>
+                  <option value="56">Comfortable</option>
+                  <option value="68">Spacious</option>
+                </select>
+              </div>
+              </div>
+
+              <div class="settings-group">
+              <h3>Export</h3>
+              <div class="field-row">
+                <div class="field">
+                  <label for="exportThemeSelect">Theme</label>
+                  <select id="exportThemeSelect">
+                    <option value="current">Current app theme</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="pngScaleSelect">PNG quality</label>
+                  <select id="pngScaleSelect">
+                    <option value="2">Standard (2x)</option>
+                    <option value="3">High (3x)</option>
+                    <option value="4">Ultra (4x)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="pdfOrientationSelect">PDF orientation</label>
+                  <select id="pdfOrientationSelect">
+                    <option value="landscape">Landscape</option>
+                    <option value="portrait">Portrait</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="pdfPageSizeSelect">PDF page size</label>
+                  <select id="pdfPageSizeSelect">
+                    <option value="a4">A4</option>
+                    <option value="a3">A3</option>
+                    <option value="letter">Letter</option>
+                  </select>
+                </div>
+              </div>
+
+              <label class="check-line" for="includeLegendInput">
+                <input id="includeLegendInput" type="checkbox" checked />
+                Include subject legend in exports
+              </label>
+              <label class="check-line" for="includeClassListInput">
+                <input id="includeClassListInput" type="checkbox" checked />
+                Include class list table in exports
+              </label>
+
+              <div class="field field-tight">
+                <label for="filePrefixInput">Export filename prefix</label>
+                <input id="filePrefixInput" type="text" maxlength="40" placeholder="timetable" value="timetable" />
+              </div>
+              </div>
+
+              <p id="settingsStatus" class="settings-status" aria-live="polite"></p>
+            </div>
+          </section>
+        </aside>
+
+        <section class="card board-panel">
+          <div class="panel-top">
+            <div>
+              <h2>Timetable</h2>
+              <p id="summaryText" class="subtle"></p>
+            </div>
+            <div id="exportStatus" class="status" aria-live="polite"></div>
+          </div>
+
+          <div class="export-row">
+            <button id="exportPngBtn" type="button" class="secondary">Export PNG</button>
+            <button id="exportPdfBtn" type="button" class="secondary">Export PDF</button>
+            <button id="exportIcsBtn" type="button" class="secondary">Export ICS</button>
+            <button id="exportJsonBtn" type="button" class="secondary">Export JSON</button>
+          </div>
+
+          <div id="timetableCapture" class="timetable-capture">
+            <div id="timetableGrid" class="timetable-grid"></div>
+          </div>
+        </section>
+      </section>
+
+      <!-- Flat list of class sessions for quick edit/delete and import. -->
+      <section class="card list-panel">
+        <div class="panel-top list-top">
+          <h2>Class Sessions</h2>
+          <div class="list-actions">
+            <label class="import-label" for="importJsonInput">Import JSON</label>
+            <input id="importJsonInput" type="file" accept="application/json,.json" />
+          </div>
+        </div>
+        <div id="classList" class="class-list"></div>
+      </section>
+    </main>
+  </body>
+</html>
